@@ -10,6 +10,7 @@ const next = document.querySelector('.next')
 const widthOfPhoto = 50, unit = 'vw', duration = 500 // ms
 let index = 1
 let timer, throttleDuration = 1000 // 쓰로틀링을 위한 타이머 설정 (1s 이상으로 설정하기 )
+let isDown, startX, walk, walk2vw
 
 // 시작점 또는 끝점으로 이동하는 함수
 function slideToEnd(container, index, widthOfPhoto, unit, duration){
@@ -53,5 +54,53 @@ function throttling(handler){
   }
 }
 
+function px2vw(px){
+  return px * 100 / document.documentElement.clientWidth
+}
+
+function handleMouseDown(e){
+  console.log('down')
+  isDown = true 
+  startX = e.pageX 
+}
+function handleMouseUp(){
+  console.log('up')
+  isDown = false 
+  container.style.marginLeft = -1 * index * widthOfPhoto + unit // 드래그한 거리가 슬라이드 너비의 절반 이하이면 드래그하기전 원래 위치로 되돌아가기 
+}
+function handleMouseLeave(){
+  console.log('leave')
+  isDown = false 
+}
+function handleMouseMove(e){
+  if(!isDown) return 
+  console.log('move')
+
+  walk = e.pageX - startX 
+  walk2vw = px2vw(Math.abs(walk))
+  console.log(walk, walk2vw)
+
+  if(walk < 0){ // 왼쪽 방향으로 드래그한 경우
+    if(walk2vw < widthOfPhoto / 2){ // 드래그한 거리가 슬라이드 절반에 못미치는 경우
+      console.log('다음사진')
+      container.style.marginLeft = `${-1 * index  * widthOfPhoto - walk2vw}vw` // 현재 위치에서 드래그한 거리만큼 왼쪽으로 더 이동
+    }else{
+      throttling(moveToLeft) // 다음사진 보여주기
+    }
+  }else{ // 오른쪽 방향으로 드래그한 경우
+    if(walk2vw < widthOfPhoto / 2){ // 드래그한 거리가 슬라이드 절반에 못미치는 경우
+      console.log('이전사진')
+      container.style.marginLeft = `${-1 * index  * widthOfPhoto + walk2vw}vw` // 현재 위치에서 드래그한 거리만큼 오른쪽으로 더 이동
+    }else{
+      throttling(moveToRight) // 이전사진 보여주기
+    }
+  }
+}
+
 prev.addEventListener('click', () => throttling(moveToRight))
 next.addEventListener('click', () => throttling(moveToLeft))
+
+container.addEventListener('mousedown', handleMouseDown)
+container.addEventListener('mousemove', handleMouseMove)
+container.addEventListener('mouseup', handleMouseUp)
+container.addEventListener('mouseleave', handleMouseLeave)
