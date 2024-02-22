@@ -10,7 +10,7 @@ const next = document.querySelector('.next')
 const widthOfPhoto = 50, unit = 'vw', duration = 500 // ms
 let index = 1
 let timer, throttleDuration = 1000 // 쓰로틀링을 위한 타이머 설정 (1s 이상으로 설정하기 )
-let isDown, startX, walk, walk2vw
+let isDown, startX, walk, walk2vw, isOver
 
 // 시작점 또는 끝점으로 이동하는 함수
 function slideToEnd(container, index, widthOfPhoto, unit, duration){
@@ -54,7 +54,7 @@ function throttling(handler){
   }
 }
 
-function px2vw(px){
+function px2vw(px){  
   return px * 100 / document.documentElement.clientWidth
 }
 
@@ -64,9 +64,14 @@ function handleMouseDown(e){
   startX = e.pageX 
 }
 function handleMouseUp(){
-  console.log('up')
+  console.log('up', isOver)
   isDown = false 
-  container.style.marginLeft = -1 * index * widthOfPhoto + unit // 드래그한 거리가 슬라이드 너비의 절반 이하이면 드래그하기전 원래 위치로 되돌아가기 
+
+  if(isOver){ // 드래그한 거리가 슬라이드 너비의 절반 이하인 경우
+    console.log('못넘음')
+    container.style.marginLeft = -1 * index * widthOfPhoto + unit  // 드래그하기전 원래 위치로 되돌아가기 
+    isOver = false
+  }
 }
 function handleMouseLeave(){
   console.log('leave')
@@ -84,15 +89,19 @@ function handleMouseMove(e){
     if(walk2vw < widthOfPhoto / 2){ // 드래그한 거리가 슬라이드 절반에 못미치는 경우
       console.log('다음사진')
       container.style.marginLeft = `${-1 * index  * widthOfPhoto - walk2vw}vw` // 현재 위치에서 드래그한 거리만큼 왼쪽으로 더 이동
+      isOver = true // 절반을 넘지 못한 경우 플래그 ON
     }else{
       throttling(moveToLeft) // 다음사진 보여주기
+      isOver = false // 절반을 넘은 경우 플래그 OFF
     }
   }else{ // 오른쪽 방향으로 드래그한 경우
     if(walk2vw < widthOfPhoto / 2){ // 드래그한 거리가 슬라이드 절반에 못미치는 경우
       console.log('이전사진')
       container.style.marginLeft = `${-1 * index  * widthOfPhoto + walk2vw}vw` // 현재 위치에서 드래그한 거리만큼 오른쪽으로 더 이동
+      isOver = true // 절반을 넘지 못한 경우 플래그 ON
     }else{
       throttling(moveToRight) // 이전사진 보여주기
+      isOver = false // 절반을 넘은 경우 플래그 OFF
     }
   }
 }
