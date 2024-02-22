@@ -8,6 +8,7 @@ const prev = document.querySelector('.prev')
 const next = document.querySelector('.next')
 const widthOfPhoto = 50, unit = 'vw', duration = 500 // ms
 let index = 1
+let timer, throttleDuration = 1000 // 쓰로틀링을 위한 타이머 설정 (1s 이상으로 설정하기 )
 
 // 시작점 또는 끝점으로 이동하는 함수
 function slideToEnd(container, index, widthOfPhoto, unit, duration){
@@ -41,6 +42,15 @@ function moveToLeft(e){
     slideToEnd(container, index, widthOfPhoto, unit, duration)
   }
 }
+function throttling(handler){
+  if(!timer){
+    timer = setTimeout(function(){
+      console.log('실행')
+      handler()
+      timer = null 
+    }, throttleDuration)
+  }
+}
 
-prev.addEventListener('click', moveToRight)
-next.addEventListener('click', moveToLeft)
+prev.addEventListener('click', () => throttling(moveToRight))
+next.addEventListener('click', () => throttling(moveToLeft))
