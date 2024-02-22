@@ -2,6 +2,7 @@
 /* 쓰로틀링과 디바운싱 적용해서 막아야 할듯 */
 /* 첫번째 사진이나 마지막 사진으로 이동하고 100ms 후에 트랜지션 적용하므로 그사이 클릭하면 트랜지션이 먹히지 않음 */
 /* 그렇다고 트랜지션을 곧바로 다시 살리면 첫번째 사진이나 마지막 사진으로 이동하면서 트랜지션이 적용되서 이동하는게 보임 */
+/* 쓰로틀링 참고자료 : https://www.zerocho.com/category/JavaScript/post/59a8e9cb15ac0000182794fa */
 
 const container = document.querySelector('.container')
 const prev = document.querySelector('.prev')
